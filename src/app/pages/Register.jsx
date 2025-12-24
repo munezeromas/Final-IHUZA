@@ -1,19 +1,10 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Package, Eye, EyeOff } from 'lucide-react';
 
-/**
- * ===========================================
- * REGISTER PAGE
- * ===========================================
- * This is the registration screen where new users create accounts
- * After successful registration, they're automatically logged in
- */
-
-export default function Register({ onSwitchToLogin }) {
-  // ============================================
-  // STATE: Form inputs and UI states
-  // ============================================
+export default function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,13 +15,8 @@ export default function Register({ onSwitchToLogin }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Get register function from Auth Context
   const { register } = useAuth();
 
-  /**
-   * HANDLE INPUT CHANGES
-   * Updates form data when user types
-   */
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -38,10 +24,6 @@ export default function Register({ onSwitchToLogin }) {
     });
   };
 
-  /**
-   * HANDLE FORM SUBMISSION
-   * Called when user clicks "Create Account" button
-   */
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
@@ -66,21 +48,22 @@ export default function Register({ onSwitchToLogin }) {
       return;
     }
 
-    // Try to register
+    // Register the user
     const result = register(formData.name, formData.email, formData.password);
     
     if (!result.success) {
       setError(result.message);
       setLoading(false);
+    } else {
+      // Registration successful - auto-login happens in register function
+      // Navigate to dashboard
+      navigate('/dashboard');
     }
-    // If successful, user is automatically logged in
-    // and App.jsx will show the dashboard
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
             <Package className="w-8 h-8 text-white" />
@@ -93,17 +76,14 @@ export default function Register({ onSwitchToLogin }) {
           </p>
         </div>
 
-        {/* Register Form Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Error Message */}
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
-            {/* Name Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Full Name
@@ -118,7 +98,6 @@ export default function Register({ onSwitchToLogin }) {
               />
             </div>
 
-            {/* Email Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
@@ -133,7 +112,6 @@ export default function Register({ onSwitchToLogin }) {
               />
             </div>
 
-            {/* Password Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
@@ -161,7 +139,6 @@ export default function Register({ onSwitchToLogin }) {
               </div>
             </div>
 
-            {/* Confirm Password Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confirm Password
@@ -176,7 +153,6 @@ export default function Register({ onSwitchToLogin }) {
               />
             </div>
 
-            {/* Register Button */}
             <button
               type="submit"
               disabled={loading}
@@ -186,23 +162,15 @@ export default function Register({ onSwitchToLogin }) {
             </button>
           </form>
 
-          {/* Switch to Login */}
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
-              <button
-                onClick={onSwitchToLogin}
+              <Link
+                to="/login"
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
               >
                 Sign In
-              </button>
-            </p>
-          </div>
-
-          {/* First User Info */}
-          <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <p className="text-sm text-green-800 dark:text-green-300">
-              <strong>Note:</strong> The first user to register will automatically become the admin.
+              </Link>
             </p>
           </div>
         </div>

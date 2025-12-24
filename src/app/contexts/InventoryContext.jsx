@@ -1,21 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
-/**
- * ===========================================
- * INVENTORY CONTEXT
- * ===========================================
- * This manages all inventory data: Products, Categories, and Users
- * Provides CRUD operations (Create, Read, Update, Delete)
- * Stores everything in localStorage for persistence
- */
-
-// Create the context
 const InventoryContext = createContext();
 
-/**
- * CUSTOM HOOK to use Inventory Context
- * Usage: const { products, addProduct, updateProduct } = useInventory();
- */
 export const useInventory = () => {
   const context = useContext(InventoryContext);
   if (!context) {
@@ -24,10 +11,6 @@ export const useInventory = () => {
   return context;
 };
 
-/**
- * INITIAL SAMPLE DATA
- * These are default items that appear when the app first loads
- */
 const initialProducts = [
   {
     id: '1',
@@ -38,28 +21,7 @@ const initialProducts = [
     status: 'In Stock',
     sku: 'DELL-XPS-15',
     description: 'High-performance laptop for professionals',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    name: 'Office Chair Pro',
-    category: 'Furniture',
-    quantity: 50,
-    price: 299.99,
-    status: 'In Stock',
-    sku: 'CHAIR-PRO-001',
-    description: 'Ergonomic office chair with lumbar support',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    name: 'Wireless Mouse',
-    category: 'Electronics',
-    quantity: 5,
-    price: 29.99,
-    status: 'Low Stock',
-    sku: 'MOUSE-WIRE-001',
-    description: 'Ergonomic wireless mouse with long battery life',
+    userId: 'admin',
     createdAt: new Date().toISOString(),
   },
 ];
@@ -70,176 +32,180 @@ const initialCategories = [
     name: 'Electronics',
     description: 'Electronic devices and accessories',
     productCount: 120,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    name: 'Furniture',
-    description: 'Office and home furniture',
-    productCount: 45,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    name: 'Stationery',
-    description: 'Office supplies and stationery',
-    productCount: 15,
+    userId: 'admin',
     createdAt: new Date().toISOString(),
   },
 ];
 
-/**
- * INVENTORY PROVIDER COMPONENT
- * Wraps the app and provides inventory data to all components
- */
 export const InventoryProvider = ({ children }) => {
-  // ============================================
-  // STATE: Store products, categories, and users
-  // ============================================
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const { user, isAdmin } = useAuth();
+  const [allProducts, setAllProducts] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
   const [users, setUsers] = useState([]);
 
-  /**
-   * EFFECT: Load data from localStorage when app starts
-   * If no data exists, use initial sample data
-   */
+  // Load data from localStorage on mount
   useEffect(() => {
-    // Load products
     const savedProducts = localStorage.getItem('ihuza_products');
     if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
+      setAllProducts(JSON.parse(savedProducts));
     } else {
-      // First time - save initial data
-      setProducts(initialProducts);
+      setAllProducts(initialProducts);
       localStorage.setItem('ihuza_products', JSON.stringify(initialProducts));
     }
 
-    // Load categories
     const savedCategories = localStorage.getItem('ihuza_categories');
     if (savedCategories) {
-      setCategories(JSON.parse(savedCategories));
+      setAllCategories(JSON.parse(savedCategories));
     } else {
-      setCategories(initialCategories);
+      setAllCategories(initialCategories);
       localStorage.setItem('ihuza_categories', JSON.stringify(initialCategories));
     }
 
-    // Load users (from the auth users list)
     const savedUsers = localStorage.getItem('ihuza_users');
     if (savedUsers) {
       setUsers(JSON.parse(savedUsers));
     }
-  }, []); // Run once on mount
+  }, []);
 
   // ============================================
-  // PRODUCTS CRUD OPERATIONS
+  // CRITICAL: DATA FILTERING BY USER
   // ============================================
+  // Admin sees ALL data
+  // Regular users see ONLY their own data
+  const products = isAdmin() 
+    ? allProducts 
+    : allProducts.filter(p => p.userId === user?.id);
 
-  /**
-   * ADD PRODUCT
-   * Creates a new product and saves to localStorage
-   */
+  const categories = isAdmin() 
+    ? allCategories 
+    : allCategories.filter(c => c.userId === user?.id);
+
+  // ============================================
+  // PRODUCT OPERATIONS
+  // ============================================
   const addProduct = (productData) => {
     const newProduct = {
-      id: Date.now().toString(), // Generate unique ID
+      id: Date.now().toString(),
       ...productData,
+      userId: user?.id, // CRITICAL: Assign to current user
       createdAt: new Date().toISOString(),
     };
     
-    const updatedProducts = [...products, newProduct];
-    setProducts(updatedProducts);
+    const updatedProducts = [...allProducts, newProduct];
+    setAllProducts(updatedProducts);
     localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
     return newProduct;
   };
 
-  /**
-   * UPDATE PRODUCT
-   * Updates an existing product by ID
-   */
   const updateProduct = (id, productData) => {
-    const updatedProducts = products.map((product) =>
+    const product = allProducts.find(p => p.id === id);
+    
+    // SECURITY CHECK: Only allow if admin OR owner
+    if (!isAdmin() && product?.userId !== user?.id) {
+      console.error('Permission denied: Cannot update product');
+      return;
+    }
+
+    const updatedProducts = allProducts.map((product) =>
       product.id === id ? { ...product, ...productData } : product
     );
     
-    setProducts(updatedProducts);
+    setAllProducts(updatedProducts);
     localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
   };
 
-  /**
-   * DELETE PRODUCT
-   * Removes a product by ID
-   */
   const deleteProduct = (id) => {
-    const updatedProducts = products.filter((product) => product.id !== id);
-    setProducts(updatedProducts);
+    const product = allProducts.find(p => p.id === id);
+    
+    // SECURITY CHECK: Only allow if admin OR owner
+    if (!isAdmin() && product?.userId !== user?.id) {
+      console.error('Permission denied: Cannot delete product');
+      return;
+    }
+
+    const updatedProducts = allProducts.filter((product) => product.id !== id);
+    setAllProducts(updatedProducts);
     localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
   };
 
-  /**
-   * GET PRODUCT BY ID
-   * Finds and returns a single product
-   */
   const getProductById = (id) => {
-    return products.find((product) => product.id === id);
+    const product = allProducts.find((product) => product.id === id);
+    
+    // SECURITY CHECK: Only return if admin OR owner
+    if (!isAdmin() && product?.userId !== user?.id) {
+      return null;
+    }
+    return product;
   };
 
   // ============================================
-  // CATEGORIES CRUD OPERATIONS
+  // CATEGORY OPERATIONS
   // ============================================
-
-  /**
-   * ADD CATEGORY
-   */
   const addCategory = (categoryData) => {
     const newCategory = {
       id: Date.now().toString(),
       ...categoryData,
       productCount: 0,
+      userId: user?.id, // CRITICAL: Assign to current user
       createdAt: new Date().toISOString(),
     };
     
-    const updatedCategories = [...categories, newCategory];
-    setCategories(updatedCategories);
+    const updatedCategories = [...allCategories, newCategory];
+    setAllCategories(updatedCategories);
     localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
     return newCategory;
   };
 
-  /**
-   * UPDATE CATEGORY
-   */
   const updateCategory = (id, categoryData) => {
-    const updatedCategories = categories.map((category) =>
+    const category = allCategories.find(c => c.id === id);
+    
+    // SECURITY CHECK: Only allow if admin OR owner
+    if (!isAdmin() && category?.userId !== user?.id) {
+      console.error('Permission denied: Cannot update category');
+      return;
+    }
+
+    const updatedCategories = allCategories.map((category) =>
       category.id === id ? { ...category, ...categoryData } : category
     );
     
-    setCategories(updatedCategories);
+    setAllCategories(updatedCategories);
     localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
   };
 
-  /**
-   * DELETE CATEGORY
-   */
   const deleteCategory = (id) => {
-    const updatedCategories = categories.filter((category) => category.id !== id);
-    setCategories(updatedCategories);
+    const category = allCategories.find(c => c.id === id);
+    
+    // SECURITY CHECK: Only allow if admin OR owner
+    if (!isAdmin() && category?.userId !== user?.id) {
+      console.error('Permission denied: Cannot delete category');
+      return;
+    }
+
+    const updatedCategories = allCategories.filter((category) => category.id !== id);
+    setAllCategories(updatedCategories);
     localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
   };
 
-  /**
-   * GET CATEGORY BY ID
-   */
   const getCategoryById = (id) => {
-    return categories.find((category) => category.id === id);
+    const category = allCategories.find((category) => category.id === id);
+    
+    // SECURITY CHECK: Only return if admin OR owner
+    if (!isAdmin() && category?.userId !== user?.id) {
+      return null;
+    }
+    return category;
   };
 
   // ============================================
-  // USERS CRUD OPERATIONS (Admin only)
+  // USER OPERATIONS (Admin Only)
   // ============================================
-
-  /**
-   * ADD USER (Admin only)
-   */
   const addUser = (userData) => {
+    if (!isAdmin()) {
+      console.error('Permission denied: Only admins can add users');
+      return;
+    }
+
     const newUser = {
       id: Date.now().toString(),
       ...userData,
@@ -252,10 +218,12 @@ export const InventoryProvider = ({ children }) => {
     return newUser;
   };
 
-  /**
-   * UPDATE USER (Admin only)
-   */
   const updateUser = (id, userData) => {
+    if (!isAdmin()) {
+      console.error('Permission denied: Only admins can update users');
+      return;
+    }
+
     const updatedUsers = users.map((user) =>
       user.id === id ? { ...user, ...userData } : user
     );
@@ -264,27 +232,28 @@ export const InventoryProvider = ({ children }) => {
     localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
   };
 
-  /**
-   * DELETE USER (Admin only)
-   */
   const deleteUser = (id) => {
+    if (!isAdmin()) {
+      console.error('Permission denied: Only admins can delete users');
+      return;
+    }
+
     const updatedUsers = users.filter((user) => user.id !== id);
     setUsers(updatedUsers);
     localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
   };
 
-  /**
-   * GET USER BY ID
-   */
   const getUserById = (id) => {
+    if (!isAdmin()) {
+      console.error('Permission denied: Only admins can view user details');
+      return null;
+    }
     return users.find((user) => user.id === id);
   };
 
-  /**
-   * REFRESH USERS
-   * Re-load users from localStorage (useful after updates)
-   */
   const refreshUsers = () => {
+    if (!isAdmin()) return;
+    
     const savedUsers = localStorage.getItem('ihuza_users');
     if (savedUsers) {
       setUsers(JSON.parse(savedUsers));
@@ -292,14 +261,10 @@ export const InventoryProvider = ({ children }) => {
   };
 
   // ============================================
-  // STATISTICS HELPERS
+  // DASHBOARD STATS
   // ============================================
-
-  /**
-   * GET DASHBOARD STATS
-   * Calculates summary statistics for the dashboard
-   */
   const getDashboardStats = () => {
+    // Stats are based on filtered products/categories (user's own data)
     const totalProducts = products.length;
     const lowStockProducts = products.filter((p) => p.quantity < 10).length;
     const totalValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
@@ -307,32 +272,31 @@ export const InventoryProvider = ({ children }) => {
     return {
       totalProducts,
       totalCategories: categories.length,
-      totalUsers: users.length,
+      totalUsers: isAdmin() ? users.length : 0, // Only admins see user count
       lowStockProducts,
       totalValue,
     };
   };
 
-  // ============================================
-  // VALUE: Everything we want to share
-  // ============================================
   const value = {
-    // Products
+    // Filtered data (user's own or all if admin)
     products,
+    categories,
+    users: isAdmin() ? users : [], // Only admins see users
+    
+    // Product operations
     addProduct,
     updateProduct,
     deleteProduct,
     getProductById,
     
-    // Categories
-    categories,
+    // Category operations
     addCategory,
     updateCategory,
     deleteCategory,
     getCategoryById,
     
-    // Users
-    users,
+    // User operations (admin only)
     addUser,
     updateUser,
     deleteUser,
