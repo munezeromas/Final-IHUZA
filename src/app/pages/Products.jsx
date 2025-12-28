@@ -2,21 +2,10 @@ import { useState } from 'react';
 import { useInventory } from '../contexts/InventoryContext';
 import { Plus, Search, Edit2, Trash2, X, Package } from 'lucide-react';
 
-/**
- * ===========================================
- * PRODUCTS PAGE
- * ===========================================
- * This page shows all products with full CRUD operations:
- * - Create: Add new products
- * - Read: View all products in a table
- * - Update: Edit existing products
- * - Delete: Remove products
- */
+
 
 export default function Products() {
-  // ============================================
   // STATE AND CONTEXT
-  // ============================================
   const { products, categories, addProduct, updateProduct, deleteProduct } = useInventory();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -153,9 +142,7 @@ export default function Products() {
 
   return (
     <div className="space-y-6">
-      {/* ============================================ */}
       {/* PAGE HEADER */}
-      {/* ============================================ */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Products</h1>
@@ -172,9 +159,7 @@ export default function Products() {
         </button>
       </div>
 
-      {/* ============================================ */}
       {/* SEARCH BAR */}
-      {/* ============================================ */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -188,9 +173,7 @@ export default function Products() {
         </div>
       </div>
 
-      {/* ============================================ */}
       {/* PRODUCTS TABLE */}
-      {/* ============================================ */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -276,9 +259,7 @@ export default function Products() {
         </div>
       </div>
 
-      {/* ============================================ */}
       {/* ADD/EDIT MODAL */}
-      {/* ============================================ */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
