@@ -3,18 +3,10 @@ import { useInventory } from '../contexts/InventoryContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Plus, Search, Edit2, Trash2, X, Users as UsersIcon, Shield, User } from 'lucide-react';
 
-/**
- * ===========================================
- * USERS PAGE (ADMIN ONLY)
- * ===========================================
- * This page allows admins to manage user accounts
- * Only accessible to users with admin role
- */
+
 
 export default function Users() {
-  // ============================================
   // STATE AND CONTEXT
-  // ============================================
   const { users, addUser, updateUser, deleteUser, refreshUsers } = useInventory();
   const { user: currentUser } = useAuth();
   
@@ -147,9 +139,7 @@ export default function Users() {
 
   return (
     <div className="space-y-6">
-      {/* ============================================ */}
       {/* PAGE HEADER */}
-      {/* ============================================ */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Users Management</h1>
@@ -166,9 +156,7 @@ export default function Users() {
         </button>
       </div>
 
-      {/* ============================================ */}
       {/* SEARCH BAR */}
-      {/* ============================================ */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -273,9 +261,7 @@ export default function Users() {
         </div>
       </div>
 
-      {/* ============================================ */}
       {/* ADD/EDIT MODAL */}
-      {/* ============================================ */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md">
