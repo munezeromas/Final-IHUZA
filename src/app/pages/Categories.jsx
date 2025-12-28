@@ -3,16 +3,11 @@ import { useInventory } from '../contexts/InventoryContext';
 import { Plus, Search, Edit2, Trash2, X, FolderTree } from 'lucide-react';
 
 /**
- * ===========================================
- * CATEGORIES PAGE
- * ===========================================
  * This page manages product categories with CRUD operations
  */
 
 export default function Categories() {
-  // ============================================
   // STATE AND CONTEXT
-  // ============================================
   const { categories, addCategory, updateCategory, deleteCategory } = useInventory();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,9 +94,7 @@ export default function Categories() {
 
   return (
     <div className="space-y-6">
-      {/* ============================================ */}
       {/* PAGE HEADER */}
-      {/* ============================================ */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
@@ -118,9 +111,7 @@ export default function Categories() {
         </button>
       </div>
 
-      {/* ============================================ */}
       {/* SEARCH BAR */}
-      {/* ============================================ */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -134,9 +125,7 @@ export default function Categories() {
         </div>
       </div>
 
-      {/* ============================================ */}
       {/* CATEGORIES GRID */}
-      {/* ============================================ */}
       {filteredCategories.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
           <FolderTree className="w-12 h-12 text-gray-400 mx-auto mb-3" />
@@ -192,9 +181,7 @@ export default function Categories() {
         </div>
       )}
 
-      {/* ============================================ */}
       {/* ADD/EDIT MODAL */}
-      {/* ============================================ */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md">
