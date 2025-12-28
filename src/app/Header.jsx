@@ -2,14 +2,6 @@ import { useAuth } from './contexts/AuthContext';
 import { useTheme } from './contexts/ThemeContext';
 import { Bell, Settings, Sun, Moon } from 'lucide-react';
 
-/**
- * ===========================================
- * HEADER COMPONENT
- * ===========================================
- * Top navigation bar with title, theme toggle, and user info
- * Shows current user's name and email
- * Provides dark/light theme toggle
- */
 
 export default function Header({ activePage }) {
   // Get current user from auth context
@@ -21,9 +13,7 @@ export default function Header({ activePage }) {
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4">
       <div className="flex items-center justify-between">
-        {/* ============================================ */}
-        {/* LEFT SIDE - Page Title */}
-        {/* ============================================ */}
+      
         <div>
           <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
             {activePage || 'Dashboard'}
@@ -33,9 +23,7 @@ export default function Header({ activePage }) {
           </p>
         </div>
         
-        {/* ============================================ */}
-        {/* RIGHT SIDE - Actions and User Profile */}
-        {/* ============================================ */}
+    
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Theme toggle button */}
           <button
