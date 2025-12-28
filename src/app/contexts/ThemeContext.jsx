@@ -1,20 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-/**
- * ===========================================
- * THEME CONTEXT
- * ===========================================
- * This manages dark/light theme switching
- * Saves preference to localStorage so it persists between sessions
- */
-
 // Create the context
 const ThemeContext = createContext();
 
-/**
- * CUSTOM HOOK to use Theme Context
- * Usage: const { theme, toggleTheme } = useTheme();
- */
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
@@ -23,18 +11,11 @@ export const useTheme = () => {
   return context;
 };
 
-/**
- * THEME PROVIDER COMPONENT
- * Wraps the app and provides theme functionality
- */
 export const ThemeProvider = ({ children }) => {
   // STATE: Current theme ('light' or 'dark')
   const [theme, setTheme] = useState('light');
 
-  /**
-   * EFFECT: Load saved theme from localStorage when app starts
-   * Also apply the theme class to the document
-   */
+
   useEffect(() => {
     // Check localStorage for saved theme
     const savedTheme = localStorage.getItem('ihuza_theme');
@@ -47,10 +28,6 @@ export const ThemeProvider = ({ children }) => {
     }
   }, []); // Run once on mount
 
-  /**
-   * TOGGLE THEME FUNCTION
-   * Switches between light and dark theme
-   */
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
