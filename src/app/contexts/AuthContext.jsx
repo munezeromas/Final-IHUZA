@@ -5,7 +5,7 @@ const AuthContext = createContext();
 // HARDCODED ADMIN CREDENTIALS (hidden from regular users)
 const ADMIN_CREDENTIALS = {
   email: 'admin@ihuza.com',
-  password: '123456', // Change this to your secure password
+  password: '123456',
   user: {
     id: 'admin-001',
     name: 'System Administrator',
