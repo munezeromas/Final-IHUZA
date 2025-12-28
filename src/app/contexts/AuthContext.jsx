@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// HARDCODED ADMIN CREDENTIALS (hidden from regular users)
 const ADMIN_CREDENTIALS = {
   email: 'admin@ihuza.com',
   password: '123456',
@@ -34,19 +33,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  /**
-   * IMPROVED LOGIN FUNCTION
-   * Checks admin credentials first, then regular users
-   */
+
   const login = (email, password) => {
-    // CHECK ADMIN CREDENTIALS FIRST
     if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
       setUser(ADMIN_CREDENTIALS.user);
       localStorage.setItem('ihuza_user', JSON.stringify(ADMIN_CREDENTIALS.user));
       return true;
     }
 
-    // CHECK REGULAR USERS
     const usersData = localStorage.getItem('ihuza_users');
     const users = usersData ? JSON.parse(usersData) : [];
 
@@ -70,12 +64,8 @@ export const AuthProvider = ({ children }) => {
     return false;
   };
 
-  /**
-   * IMPROVED REGISTER FUNCTION
-   * All new users are regular users (not admin)
-   */
+ 
   const register = (name, email, password) => {
-    // PREVENT ADMIN EMAIL FROM BEING REGISTERED
     if (email === ADMIN_CREDENTIALS.email) {
       return { success: false, message: 'This email is not available' };
     }
@@ -92,7 +82,7 @@ export const AuthProvider = ({ children }) => {
       name,
       email,
       password,
-      role: 'user', // ALL NEW USERS ARE REGULAR USERS
+      role: 'user', 
       createdAt: new Date().toISOString(),
     };
 
@@ -112,10 +102,7 @@ export const AuthProvider = ({ children }) => {
     return { success: true };
   };
 
-  /**
-   * GET ALL USERS (for admin only)
-   * Admin is NOT included in this list
-   */
+
   const getAllUsers = () => {
     if (!isAdmin()) return [];
     
@@ -139,7 +126,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     isAdmin,
-    getAllUsers, // New function for admin to see users
+    getAllUsers, 
   };
 
   return (
