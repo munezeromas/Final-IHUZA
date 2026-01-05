@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { toast } from 'sonner';
 
 const InventoryContext = createContext();
 
@@ -84,48 +85,84 @@ export const InventoryProvider = ({ children }) => {
   // PRODUCT OPERATIONS
   // ============================================
   const addProduct = (productData) => {
-    const newProduct = {
-      id: Date.now().toString(),
-      ...productData,
-      userId: user?.id, // CRITICAL: Assign to current user
-      createdAt: new Date().toISOString(),
-    };
-    
-    const updatedProducts = [...allProducts, newProduct];
-    setAllProducts(updatedProducts);
-    localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
-    return newProduct;
+    try {
+      const newProduct = {
+        id: Date.now().toString(),
+        ...productData,
+        userId: user?.id, // CRITICAL: Assign to current user
+        createdAt: new Date().toISOString(),
+      };
+      
+      const updatedProducts = [...allProducts, newProduct];
+      setAllProducts(updatedProducts);
+      localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
+      
+      toast.success('Product added successfully', {
+        description: `${productData.name} has been added to inventory`
+      });
+      
+      return newProduct;
+    } catch (error) {
+      toast.error('Failed to add product', {
+        description: 'Please try again'
+      });
+      return null;
+    }
   };
 
   const updateProduct = (id, productData) => {
-    const product = allProducts.find(p => p.id === id);
-    
-    // SECURITY CHECK: Only allow if admin OR owner
-    if (!isAdmin() && product?.userId !== user?.id) {
-      console.error('Permission denied: Cannot update product');
-      return;
-    }
+    try {
+      const product = allProducts.find(p => p.id === id);
+      
+      // SECURITY CHECK: Only allow if admin OR owner
+      if (!isAdmin() && product?.userId !== user?.id) {
+        toast.error('Permission denied', {
+          description: 'You cannot update this product'
+        });
+        return;
+      }
 
-    const updatedProducts = allProducts.map((product) =>
-      product.id === id ? { ...product, ...productData } : product
-    );
-    
-    setAllProducts(updatedProducts);
-    localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
+      const updatedProducts = allProducts.map((product) =>
+        product.id === id ? { ...product, ...productData } : product
+      );
+      
+      setAllProducts(updatedProducts);
+      localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
+      
+      toast.success('Product updated successfully', {
+        description: `${productData.name} has been updated`
+      });
+    } catch (error) {
+      toast.error('Failed to update product', {
+        description: 'Please try again'
+      });
+    }
   };
 
   const deleteProduct = (id) => {
-    const product = allProducts.find(p => p.id === id);
-    
-    // SECURITY CHECK: Only allow if admin OR owner
-    if (!isAdmin() && product?.userId !== user?.id) {
-      console.error('Permission denied: Cannot delete product');
-      return;
-    }
+    try {
+      const product = allProducts.find(p => p.id === id);
+      
+      // SECURITY CHECK: Only allow if admin OR owner
+      if (!isAdmin() && product?.userId !== user?.id) {
+        toast.error('Permission denied', {
+          description: 'You cannot delete this product'
+        });
+        return;
+      }
 
-    const updatedProducts = allProducts.filter((product) => product.id !== id);
-    setAllProducts(updatedProducts);
-    localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
+      const updatedProducts = allProducts.filter((product) => product.id !== id);
+      setAllProducts(updatedProducts);
+      localStorage.setItem('ihuza_products', JSON.stringify(updatedProducts));
+      
+      toast.success('Product deleted successfully', {
+        description: `${product.name} has been removed from inventory`
+      });
+    } catch (error) {
+      toast.error('Failed to delete product', {
+        description: 'Please try again'
+      });
+    }
   };
 
   const getProductById = (id) => {
@@ -142,49 +179,85 @@ export const InventoryProvider = ({ children }) => {
   // CATEGORY OPERATIONS
   // ============================================
   const addCategory = (categoryData) => {
-    const newCategory = {
-      id: Date.now().toString(),
-      ...categoryData,
-      productCount: 0,
-      userId: user?.id, // CRITICAL: Assign to current user
-      createdAt: new Date().toISOString(),
-    };
-    
-    const updatedCategories = [...allCategories, newCategory];
-    setAllCategories(updatedCategories);
-    localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
-    return newCategory;
+    try {
+      const newCategory = {
+        id: Date.now().toString(),
+        ...categoryData,
+        productCount: 0,
+        userId: user?.id, // CRITICAL: Assign to current user
+        createdAt: new Date().toISOString(),
+      };
+      
+      const updatedCategories = [...allCategories, newCategory];
+      setAllCategories(updatedCategories);
+      localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
+      
+      toast.success('Category added successfully', {
+        description: `${categoryData.name} has been created`
+      });
+      
+      return newCategory;
+    } catch (error) {
+      toast.error('Failed to add category', {
+        description: 'Please try again'
+      });
+      return null;
+    }
   };
 
   const updateCategory = (id, categoryData) => {
-    const category = allCategories.find(c => c.id === id);
-    
-    // SECURITY CHECK: Only allow if admin OR owner
-    if (!isAdmin() && category?.userId !== user?.id) {
-      console.error('Permission denied: Cannot update category');
-      return;
-    }
+    try {
+      const category = allCategories.find(c => c.id === id);
+      
+      // SECURITY CHECK: Only allow if admin OR owner
+      if (!isAdmin() && category?.userId !== user?.id) {
+        toast.error('Permission denied', {
+          description: 'You cannot update this category'
+        });
+        return;
+      }
 
-    const updatedCategories = allCategories.map((category) =>
-      category.id === id ? { ...category, ...categoryData } : category
-    );
-    
-    setAllCategories(updatedCategories);
-    localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
+      const updatedCategories = allCategories.map((category) =>
+        category.id === id ? { ...category, ...categoryData } : category
+      );
+      
+      setAllCategories(updatedCategories);
+      localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
+      
+      toast.success('Category updated successfully', {
+        description: `${categoryData.name} has been updated`
+      });
+    } catch (error) {
+      toast.error('Failed to update category', {
+        description: 'Please try again'
+      });
+    }
   };
 
   const deleteCategory = (id) => {
-    const category = allCategories.find(c => c.id === id);
-    
-    // SECURITY CHECK: Only allow if admin OR owner
-    if (!isAdmin() && category?.userId !== user?.id) {
-      console.error('Permission denied: Cannot delete category');
-      return;
-    }
+    try {
+      const category = allCategories.find(c => c.id === id);
+      
+      // SECURITY CHECK: Only allow if admin OR owner
+      if (!isAdmin() && category?.userId !== user?.id) {
+        toast.error('Permission denied', {
+          description: 'You cannot delete this category'
+        });
+        return;
+      }
 
-    const updatedCategories = allCategories.filter((category) => category.id !== id);
-    setAllCategories(updatedCategories);
-    localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
+      const updatedCategories = allCategories.filter((category) => category.id !== id);
+      setAllCategories(updatedCategories);
+      localStorage.setItem('ihuza_categories', JSON.stringify(updatedCategories));
+      
+      toast.success('Category deleted successfully', {
+        description: `${category.name} has been removed`
+      });
+    } catch (error) {
+      toast.error('Failed to delete category', {
+        description: 'Please try again'
+      });
+    }
   };
 
   const getCategoryById = (id) => {
@@ -202,50 +275,91 @@ export const InventoryProvider = ({ children }) => {
   // ============================================
   const addUser = (userData) => {
     if (!isAdmin()) {
-      console.error('Permission denied: Only admins can add users');
+      toast.error('Permission denied', {
+        description: 'Only admins can add users'
+      });
       return;
     }
 
-    const newUser = {
-      id: Date.now().toString(),
-      ...userData,
-      createdAt: new Date().toISOString(),
-    };
-    
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
-    return newUser;
+    try {
+      const newUser = {
+        id: Date.now().toString(),
+        ...userData,
+        createdAt: new Date().toISOString(),
+      };
+      
+      const updatedUsers = [...users, newUser];
+      setUsers(updatedUsers);
+      localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
+      
+      toast.success('User added successfully', {
+        description: `${userData.name} has been added to the system`
+      });
+      
+      return newUser;
+    } catch (error) {
+      toast.error('Failed to add user', {
+        description: 'Please try again'
+      });
+      return null;
+    }
   };
 
   const updateUser = (id, userData) => {
     if (!isAdmin()) {
-      console.error('Permission denied: Only admins can update users');
+      toast.error('Permission denied', {
+        description: 'Only admins can update users'
+      });
       return;
     }
 
-    const updatedUsers = users.map((user) =>
-      user.id === id ? { ...user, ...userData } : user
-    );
-    
-    setUsers(updatedUsers);
-    localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
+    try {
+      const updatedUsers = users.map((user) =>
+        user.id === id ? { ...user, ...userData } : user
+      );
+      
+      setUsers(updatedUsers);
+      localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
+      
+      toast.success('User updated successfully', {
+        description: `${userData.name} has been updated`
+      });
+    } catch (error) {
+      toast.error('Failed to update user', {
+        description: 'Please try again'
+      });
+    }
   };
 
   const deleteUser = (id) => {
     if (!isAdmin()) {
-      console.error('Permission denied: Only admins can delete users');
+      toast.error('Permission denied', {
+        description: 'Only admins can delete users'
+      });
       return;
     }
 
-    const updatedUsers = users.filter((user) => user.id !== id);
-    setUsers(updatedUsers);
-    localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
+    try {
+      const user = users.find(u => u.id === id);
+      const updatedUsers = users.filter((user) => user.id !== id);
+      setUsers(updatedUsers);
+      localStorage.setItem('ihuza_users', JSON.stringify(updatedUsers));
+      
+      toast.success('User deleted successfully', {
+        description: `${user.name} has been removed from the system`
+      });
+    } catch (error) {
+      toast.error('Failed to delete user', {
+        description: 'Please try again'
+      });
+    }
   };
 
   const getUserById = (id) => {
     if (!isAdmin()) {
-      console.error('Permission denied: Only admins can view user details');
+      toast.error('Permission denied', {
+        description: 'Only admins can view user details'
+      });
       return null;
     }
     return users.find((user) => user.id === id);

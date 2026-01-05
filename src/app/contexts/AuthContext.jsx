@@ -7,7 +7,7 @@ const ADMIN_CREDENTIALS = {
   password: '123456',
   user: {
     id: 'admin-001',
-    name: 'System Administrator',
+    name: 'Admin',
     email: 'admin@ihuza.com',
     role: 'admin',
   }
@@ -114,6 +114,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('ihuza_user');
   };
+
 
   const isAdmin = () => {
     return user?.role === 'admin';

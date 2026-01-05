@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useInventory } from '../contexts/InventoryContext';
 import { Plus, Search, Edit2, Trash2, X, Package } from 'lucide-react';
-
-
+import { toast } from 'sonner';
 
 export default function Products() {
   // STATE AND CONTEXT
@@ -107,10 +106,40 @@ export default function Products() {
    * HANDLE DELETE
    * Removes a product after confirmation
    */
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      deleteProduct(id);
-    }
+  const handleDelete = (id, productName) => {
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col gap-3">
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Delete Product</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Are you sure you want to delete "{productName}"? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => {
+                toast.dismiss(t);
+              }}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                deleteProduct(id);
+                toast.dismiss(t);
+              }}
+              className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+    });
   };
 
   /**
@@ -245,7 +274,7 @@ export default function Products() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => handleDelete(product.id, product.name)}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                       >
                         <Trash2 className="w-4 h-4" />

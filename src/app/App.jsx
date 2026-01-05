@@ -1,9 +1,13 @@
+import { Toaster } from 'sonner';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { InventoryProvider } from './contexts/InventoryContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
+
 import Sidebar from './Sidebar';
 import Header from './Header';
+
 import DashboardComponent from './DashboardComponent';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -15,11 +19,16 @@ export default function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
-        <AuthProvider>
-          <InventoryProvider>
-            <AppRoutes />
-          </InventoryProvider>
-        </AuthProvider>
+        {/* SONNER TOASTER – ONE TIME */}
+        <Toaster richColors position="top-right" />
+
+        <ToastProvider>
+          <AuthProvider>
+            <InventoryProvider>
+              <AppRoutes />
+            </InventoryProvider>
+          </AuthProvider>
+        </ToastProvider>
       </ThemeProvider>
     </BrowserRouter>
   );
@@ -28,7 +37,7 @@ export default function App() {
 function AppRoutes() {
   const { user } = useAuth();
 
-  // If user is not logged in, show auth pages
+  // Auth routes for users not logged in
   if (!user) {
     return (
       <Routes>
@@ -39,7 +48,7 @@ function AppRoutes() {
     );
   }
 
-  // If user is logged in, show main app with sidebar
+  // Main app routes for logged-in users
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       <Sidebar />
@@ -47,13 +56,13 @@ function AppRoutes() {
         <Header />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <Routes>
+            {/* Redirect root to dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardComponent />} />
             <Route path="/products" element={<Products />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/register" element={<Navigate to="/dashboard" replace />} />
+            {/* Catch all unknown routes */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>

@@ -2,32 +2,38 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Package, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
+    // Validation
     if (!email || !password) {
-      setError('Please fill in all fields');
+      toast.warning('Please fill in all fields');
       setLoading(false);
       return;
     }
 
     const success = login(email, password);
+
     if (!success) {
-      setError('Invalid email or password');
+      toast.error('Login failed', {
+        description: 'Invalid email or password'
+      });
       setLoading(false);
     } else {
+      toast.success('Welcome to IHUZA', {
+        description: 'Successfully logged in — built by MAS'
+      });
       navigate('/dashboard');
     }
   };
@@ -49,12 +55,6 @@ export default function Login() {
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Package, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ export default function Register() {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { register } = useAuth();
@@ -26,24 +26,27 @@ export default function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     // Validation
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError('Please fill in all fields');
+      toast.warning('Please fill in all fields');
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      toast.error('Password too short', {
+        description: 'Password must be at least 6 characters'
+      });
       setLoading(false);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match', {
+        description: 'Please make sure both passwords are the same'
+      });
       setLoading(false);
       return;
     }
@@ -52,9 +55,14 @@ export default function Register() {
     const result = register(formData.name, formData.email, formData.password);
     
     if (!result.success) {
-      setError(result.message);
+      toast.error('Registration failed', {
+        description: result.message
+      });
       setLoading(false);
     } else {
+      toast.success('Account created successfully', {
+        description: 'Welcome to IHUZA — built by MAS'
+      });
       // Registration successful - auto-login happens in register function
       // Navigate to dashboard
       navigate('/dashboard');
@@ -78,12 +86,6 @@ export default function Register() {
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Full Name

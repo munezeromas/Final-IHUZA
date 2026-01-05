@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useInventory } from '../contexts/InventoryContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Plus, Search, Edit2, Trash2, X, Users as UsersIcon, Shield, User } from 'lucide-react';
-
-
+import { toast } from 'sonner';
 
 export default function Users() {
   // STATE AND CONTEXT
@@ -84,7 +83,7 @@ export default function Users() {
     } else {
       // Add new user
       if (!formData.password) {
-        alert('Password is required for new users');
+        toast.error('Password is required for new users');
         return;
       }
       addUser(formData);
@@ -106,17 +105,48 @@ export default function Users() {
   /**
    * HANDLE DELETE
    */
-  const handleDelete = (id) => {
+  const handleDelete = (id, userName) => {
     // Prevent deleting yourself
     if (id === currentUser.id) {
-      alert('You cannot delete your own account!');
+      toast.error('Cannot delete your own account', {
+        description: 'You cannot delete the account you are currently logged in with'
+      });
       return;
     }
 
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      deleteUser(id);
-      refreshUsers();
-    }
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col gap-3">
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Delete User</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Are you sure you want to delete user "{userName}"? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => {
+                toast.dismiss(t);
+              }}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                deleteUser(id);
+                toast.dismiss(t);
+              }}
+              className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+    });
   };
 
   /**
@@ -170,9 +200,7 @@ export default function Users() {
         </div>
       </div>
 
-      {/* ============================================ */}
       {/* USERS TABLE */}
-      {/* ============================================ */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -246,7 +274,7 @@ export default function Users() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDelete(user.id, user.name)}
                         disabled={user.id === currentUser.id}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
