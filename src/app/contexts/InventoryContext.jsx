@@ -367,9 +367,7 @@ export const InventoryProvider = ({ children }) => {
     }
   };
 
-  // ============================================
-  // DASHBOARD STATS
-  // ============================================
+
   const getDashboardStats = () => {
     // Stats are based on filtered products/categories (user's own data)
     const totalProducts = products.length;
