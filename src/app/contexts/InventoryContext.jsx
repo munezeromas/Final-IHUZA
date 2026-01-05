@@ -81,9 +81,7 @@ export const InventoryProvider = ({ children }) => {
     ? allCategories 
     : allCategories.filter(c => c.userId === user?.id);
 
-  // ============================================
-  // PRODUCT OPERATIONS
-  // ============================================
+
   const addProduct = (productData) => {
     try {
       const newProduct = {
@@ -175,16 +173,13 @@ export const InventoryProvider = ({ children }) => {
     return product;
   };
 
-  // ============================================
-  // CATEGORY OPERATIONS
-  // ============================================
   const addCategory = (categoryData) => {
     try {
       const newCategory = {
         id: Date.now().toString(),
         ...categoryData,
         productCount: 0,
-        userId: user?.id, // CRITICAL: Assign to current user
+        userId: user?.id, 
         createdAt: new Date().toISOString(),
       };
       
@@ -270,9 +265,7 @@ export const InventoryProvider = ({ children }) => {
     return category;
   };
 
-  // ============================================
-  // USER OPERATIONS (Admin Only)
-  // ============================================
+
   const addUser = (userData) => {
     if (!isAdmin()) {
       toast.error('Permission denied', {
