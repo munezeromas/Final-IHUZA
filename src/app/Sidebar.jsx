@@ -9,6 +9,7 @@ import {
   Layers,
   AlignLeft,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Sidebar() {
   const { user, logout, isAdmin } = useAuth();
@@ -77,10 +78,43 @@ export default function Sidebar() {
   });
 
   const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      logout();
-      navigate('/login');
-    }
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col gap-3">
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Logout</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Are you sure you want to logout?
+            </p>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => {
+                toast.dismiss(t);
+              }}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                logout();
+                toast.dismiss(t);
+                toast.success('Logged out successfully', {
+                  description: 'See you soon!'
+                });
+                navigate('/login');
+              }}
+              className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+    });
   };
 
   // Check if current route matches the menu item path
@@ -89,9 +123,9 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-16 sm:w-20 lg:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+    <div className="w-16 sm:w-20 lg:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full">
       {/* LOGO SECTION */}
-      <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-3 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
             <Package className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -103,8 +137,8 @@ export default function Sidebar() {
         </div>
       </div>
       
-      {/* NAVIGATION MENU */}
-      <nav className="flex-1 p-2 sm:p-3 lg:p-4">
+      {/* NAVIGATION MENU - Scrollable */}
+      <nav className="flex-1 p-2 sm:p-3 lg:p-4 overflow-y-auto overflow-x-hidden min-h-0">
         {visibleMenuItems.map((item) => (
           <button
             key={item.name}
@@ -132,10 +166,10 @@ export default function Sidebar() {
         ))}
       </nav>
       
-      {/* USER INFO & LOGOUT */}
-      <div className="p-2 sm:p-3 lg:p-4 border-t border-gray-200 dark:border-gray-700">
+      {/* USER INFO & LOGOUT - Fixed at bottom */}
+      <div className="p-2 sm:p-3 lg:p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800">
         {/* User info - only visible on large screens */}
-        <div className="hidden lg:block mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+        <div className="hidden lg:block mb-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 text-sm font-medium">
               {user && user.name ? user.name.charAt(0).toUpperCase() : 'U'}
@@ -154,11 +188,11 @@ export default function Sidebar() {
         {/* Logout button */}
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center lg:justify-start gap-3 px-2 sm:px-3 py-2 sm:py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+          className="w-full flex items-center justify-center lg:justify-start gap-3 px-3 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors font-medium"
           title="Logout"
         >
-          <LogOut className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-          <span className="hidden lg:block">Logout</span>
+          <LogOut className="w-5 h-5 flex-shrink-0" />
+          <span className="hidden lg:block text-sm">Logout</span>
         </button>
       </div>
     </div>

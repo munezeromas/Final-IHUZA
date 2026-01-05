@@ -13,6 +13,7 @@ import {
   User,
   CircleCheckBig,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function DashboardComponent() {
   const { user, isAdmin } = useAuth();
@@ -189,7 +190,7 @@ function RecentProducts() {
 
 function RecentUsersTable() {
   const { users, deleteUser } = useInventory();
-  const { isUserActive } = useAuth();
+  const { isUserActive, user: currentUser } = useAuth();
   const navigate = useNavigate();
 
   const recentUsers = [...users]
@@ -217,9 +218,47 @@ function RecentUsersTable() {
   };
 
   const handleDelete = (userId, userName) => {
-    if (window.confirm(`Are you sure you want to delete ${userName}?`)) {
-      deleteUser(userId);
+    // Prevent deleting yourself
+    if (userId === currentUser.id) {
+      toast.error('Cannot delete your own account', {
+        description: 'You cannot delete the account you are currently logged in with'
+      });
+      return;
     }
+
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col gap-3">
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Delete User</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Are you sure you want to delete "{userName}"? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => {
+                toast.dismiss(t);
+              }}
+              className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                deleteUser(userId);
+                toast.dismiss(t);
+              }}
+              className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+    });
   };
 
   const getUserStatus = (user) => {
