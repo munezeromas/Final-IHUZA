@@ -19,7 +19,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
-        {/* SONNER TOASTER – ONE TIME */}
         <Toaster richColors position="top-right" />
 
         <ToastProvider>
