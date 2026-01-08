@@ -4,7 +4,6 @@ import { Plus, Search, Edit2, Trash2, X, FolderTree } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Categories() {
-  // STATE AND CONTEXT
   const { categories, addCategory, updateCategory, deleteCategory } = useInventory();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,9 +14,6 @@ export default function Categories() {
     description: '',
   });
 
-  /**
-   * OPEN ADD MODAL
-   */
   const handleAddClick = () => {
     setEditingCategory(null);
     setFormData({
@@ -27,9 +23,7 @@ export default function Categories() {
     setShowModal(true);
   };
 
-  /**
-   * OPEN EDIT MODAL
-   */
+  
   const handleEditClick = (category) => {
     setEditingCategory(category);
     setFormData({
@@ -39,9 +33,7 @@ export default function Categories() {
     setShowModal(true);
   };
 
-  /**
-   * HANDLE FORM INPUT CHANGES
-   */
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -50,21 +42,15 @@ export default function Categories() {
     }));
   };
 
-  /**
-   * HANDLE FORM SUBMISSION
-   */
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (editingCategory) {
-      // Update existing category
       updateCategory(editingCategory.id, formData);
     } else {
-      // Add new category
       addCategory(formData);
     }
 
-    // Close modal and reset form
     setShowModal(false);
     setFormData({
       name: '',
@@ -72,9 +58,7 @@ export default function Categories() {
     });
   };
 
-  /**
-   * HANDLE DELETE
-   */
+  
   const handleDelete = (id, categoryName) => {
     toast.custom((t) => (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-700">
@@ -111,9 +95,7 @@ export default function Categories() {
     });
   };
 
-  /**
-   * FILTER CATEGORIES BY SEARCH TERM
-   */
+
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -121,7 +103,6 @@ export default function Categories() {
 
   return (
     <div className="space-y-6">
-      {/* PAGE HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
@@ -138,7 +119,6 @@ export default function Categories() {
         </button>
       </div>
 
-      {/* SEARCH BAR */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -152,7 +132,6 @@ export default function Categories() {
         </div>
       </div>
 
-      {/* CATEGORIES GRID */}
       {filteredCategories.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
           <FolderTree className="w-12 h-12 text-gray-400 mx-auto mb-3" />
@@ -167,7 +146,6 @@ export default function Categories() {
               key={category.id}
               className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-6"
             >
-              {/* Category Icon */}
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
                   <FolderTree className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -188,7 +166,6 @@ export default function Categories() {
                 </div>
               </div>
 
-              {/* Category Details */}
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {category.name}
               </h3>
@@ -196,7 +173,6 @@ export default function Categories() {
                 {category.description || 'No description'}
               </p>
 
-              {/* Product Count */}
               <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Products</span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -208,11 +184,9 @@ export default function Categories() {
         </div>
       )}
 
-      {/* ADD/EDIT MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 {editingCategory ? 'Edit Category' : 'Add New Category'}
@@ -225,9 +199,7 @@ export default function Categories() {
               </button>
             </div>
 
-            {/* Modal Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Category Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Category Name *
@@ -243,7 +215,6 @@ export default function Categories() {
                 />
               </div>
 
-              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Description
@@ -258,7 +229,6 @@ export default function Categories() {
                 />
               </div>
 
-              {/* Form Actions */}
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
