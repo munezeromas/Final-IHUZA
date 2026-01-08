@@ -68,11 +68,7 @@ export const InventoryProvider = ({ children }) => {
     }
   }, []);
 
-  // ============================================
-  // CRITICAL: DATA FILTERING BY USER
-  // ============================================
-  // Admin sees ALL data
-  // Regular users see ONLY their own data
+
   const products = isAdmin() 
     ? allProducts 
     : allProducts.filter(p => p.userId === user?.id);
@@ -87,7 +83,7 @@ export const InventoryProvider = ({ children }) => {
       const newProduct = {
         id: Date.now().toString(),
         ...productData,
-        userId: user?.id, // CRITICAL: Assign to current user
+        userId: user?.id, 
         createdAt: new Date().toISOString(),
       };
       
@@ -112,7 +108,6 @@ export const InventoryProvider = ({ children }) => {
     try {
       const product = allProducts.find(p => p.id === id);
       
-      // SECURITY CHECK: Only allow if admin OR owner
       if (!isAdmin() && product?.userId !== user?.id) {
         toast.error('Permission denied', {
           description: 'You cannot update this product'
@@ -141,7 +136,6 @@ export const InventoryProvider = ({ children }) => {
     try {
       const product = allProducts.find(p => p.id === id);
       
-      // SECURITY CHECK: Only allow if admin OR owner
       if (!isAdmin() && product?.userId !== user?.id) {
         toast.error('Permission denied', {
           description: 'You cannot delete this product'
@@ -233,7 +227,6 @@ export const InventoryProvider = ({ children }) => {
     try {
       const category = allCategories.find(c => c.id === id);
       
-      // SECURITY CHECK: Only allow if admin OR owner
       if (!isAdmin() && category?.userId !== user?.id) {
         toast.error('Permission denied', {
           description: 'You cannot delete this category'
@@ -369,7 +362,6 @@ export const InventoryProvider = ({ children }) => {
 
 
   const getDashboardStats = () => {
-    // Stats are based on filtered products/categories (user's own data)
     const totalProducts = products.length;
     const lowStockProducts = products.filter((p) => p.quantity < 10).length;
     const totalValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
@@ -377,38 +369,33 @@ export const InventoryProvider = ({ children }) => {
     return {
       totalProducts,
       totalCategories: categories.length,
-      totalUsers: isAdmin() ? users.length : 0, // Only admins see user count
+      totalUsers: isAdmin() ? users.length : 0, 
       lowStockProducts,
       totalValue,
     };
   };
 
   const value = {
-    // Filtered data (user's own or all if admin)
     products,
     categories,
-    users: isAdmin() ? users : [], // Only admins see users
+    users: isAdmin() ? users : [], 
     
-    // Product operations
     addProduct,
     updateProduct,
     deleteProduct,
     getProductById,
     
-    // Category operations
     addCategory,
     updateCategory,
     deleteCategory,
     getCategoryById,
     
-    // User operations (admin only)
     addUser,
     updateUser,
     deleteUser,
     getUserById,
     refreshUsers,
     
-    // Stats
     getDashboardStats,
   };
 
